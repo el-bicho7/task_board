@@ -10,7 +10,7 @@
     integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
   <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
-
+  
   <link rel="stylesheet" href="./assets/css/style.css" />
   <title>Task Board</title>
 </head>
@@ -33,30 +33,41 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form>
+            <form id="project-form">
               <div class="row">
                 <div class="col">
                   <p>Title</p>
-                  <input type="text" class="form-control" id="taskTitle">
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="taskTitle">
                 </div>
                 <div class="col">
                   <p>Due Date</p>
-                  <input type="text" class="form-control" id="taskDate">
-                </div>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="taskDueDate">
+                </div> 
               </div>
               <div class="row">
                 <div class="col">
                   <p>Description</p>
-                  <textarea type="text" class="form-control" rows="4" id="taskDesc"></textarea>
+                  <textarea 
+                    type="text" 
+                    class="form-control" 
+                    rows="4" 
+                    id="taskDesc">
+                  </textarea>
                 </div>
               </div>
             </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+            </div>
           </div>
         </div>
-      </div>
     </div>
     <div class="row swim-lanes text-center justify-content-between">
       <div class="col-12 col-lg-4 d-flex">
