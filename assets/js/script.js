@@ -48,6 +48,21 @@ function createTaskCard(task) {
     .attr('data-task-id', task.id);
   cardDeleteButton.on('click', handleDeleteTask);
 
+  // Give color to the cards depending on the due date and status not done
+  // Red: Overdue, Yellow: Near Deadline
+  const today = dayjs();
+  const dueDateCard = dayjs(task.date);
+ 
+  console.log(today);
+  console.log(dueDateCard);
+  if (dueDateCard >= today){
+    card.addClass('bg-warning text-white');
+  } else {
+    card.addClass('bg-danger text-white');
+    cardDeleteButton.addClass('border-white')
+  }
+
+
   // Here i'm adding the cardDescription and the cardDue to the Body
   cardBody.append(cardDescription, cardDue, cardDeleteButton);
   // Here i'm adding the Header and the Body to the card
