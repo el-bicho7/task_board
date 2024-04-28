@@ -1,12 +1,9 @@
-// Retrieve tasks and nextId from localStorage
 let taskList = JSON.parse(localStorage.getItem("tasks"));
-let nextId = JSON.parse(localStorage.getItem("nextId"));
+const projectDisplayEl = $('#project-display');
 const submitButton = $('#submit');
 const taskTitleInputEl = $('#taskTitle');
 const taskDateInputEl = $('#taskDueDate');
 const taskDescrInputEl = $('#taskDesc');
-
-
 // Save function 
 function saveTaskCards(taskNotes){
   localStorage.setItem('tasks', JSON.stringify(taskNotes));
@@ -19,7 +16,7 @@ function readFromStorage(){
     taskList =[];
   }
   return taskList;
-}
+} 
 
 // Todo: create a function to generate a unique task id
 function generateTaskId() {
@@ -32,7 +29,7 @@ function createTaskCard(task) {
   // This will create a new div with a class, and attributes
   const card = $('<div>')
     .addClass('card task-card draggable my-3')
-    .attr('data-task-id', task.id);
+    .attr('data-id', task.id);
   // This will create a div and be a header
   const cardHeader = $('<div>')
     .addClass('card-header h4').text(task.title);
@@ -45,24 +42,26 @@ function createTaskCard(task) {
   const cardDeleteButton = $('<div>')
     .addClass('btn btn-danger delete')
     .text('Delete')
-    .attr('data-task-id', task.id);
+    .attr('data-id', task.id);
   cardDeleteButton.on('click', handleDeleteTask);
 
   // Give color to the cards depending on the due date and status not done
   // Red: Overdue, Yellow: Near Deadline
-  const today = dayjs();
-  const dueDateCard = dayjs(task.date);
- 
-  console.log(today);
-  console.log(dueDateCard);
-  if (dueDateCard >= today){
-    card.addClass('bg-warning text-white');
-  } else {
-    card.addClass('bg-danger text-white');
-    cardDeleteButton.addClass('border-white')
-  }
+  if (task.date && task.status !== 'done') {
+    const today = dayjs();
+    const dueDateCard = dayjs(task.date);
+    // If the dueDate is bigger than de today the background-color will  be yellow otherwise red
+    const isThesame = today.isSame(dueDateCard, 'day');
+    const isAfter = today.isAfter(dueDateCard, 'day');
 
+    if (isThesame){
+      card.addClass('bg-warning text-white');
+    } else if (isAfter) {
+      card.addClass('bg-danger text-white');
+      cardDeleteButton.addClass('border-white')
+    }};
 
+  
   // Here i'm adding the cardDescription and the cardDue to the Body
   cardBody.append(cardDescription, cardDue, cardDeleteButton);
   // Here i'm adding the Header and the Body to the card
@@ -99,9 +98,12 @@ function renderTaskList() {
   };
 
   // Draggable
-  $( ".draggable" ).draggable();
-}
+  $( ".draggable" ).draggable({
+    revert: 'true',
+    helper: 'clone'
 
+  });
+}
 
 // Todo: create a function to handle adding a new task
 function handleAddTask(event){
@@ -110,12 +112,14 @@ function handleAddTask(event){
   const taskTitle = taskTitleInputEl.val();
   const taskDate = taskDateInputEl.val();
   const taskDescrp = taskDescrInputEl.val().trim();
+  // const idCard = generateTaskId();
   // creates a new array with title, date, description, and status elements.
   const newTask = {
     title: taskTitle,
     date: taskDate,
     description: taskDescrp,
-    status: 'to-do'
+    status: 'to-do',
+    id: generateTaskId()
   };
 
   // Reads the localstorage if storage empty returns []
@@ -135,7 +139,8 @@ function handleAddTask(event){
 
 // Todo: create a function to handle deleting a task
 function handleDeleteTask(){
-  const taskId = $(this).attr('data-task-id');
+  // This will select the id of the clicked delete option
+  const taskId = $(this).attr('data-id');
   const taskNotes = readFromStorage();
 
   // The arrow function specifies the action to be performed for each element
@@ -157,10 +162,31 @@ function handleDeleteTask(){
 
 // Todo: create a function to handle dropping a task into a new status lane
 function handleDrop(event, ui) {
+  // Read tasks from localStorage
+  const taskNotes = readFromStorage();
+  // Get the ID of th task that's moving
+  const taskId = ui.draggable[0].dataset.id;
+  // Get the id of the lane that the card was dropped
+  const newStatus = event.target.id;
+  
+  for (let task of taskNotes){
+    // Find the task card by the id 
+    if (task.id === taskId) {
+      // update the status of the moved card
+      task.status = newStatus;
+    }
+  };
+  localStorage.setItem('tasks', JSON.stringify(taskNotes));
 
+  renderTaskList();
 }
 
+// This will add the task
 submitButton.on('click', handleAddTask);
+
+// This will run the delete handleDeleteTask always when the pages runs so you can delete the task easier
+projectDisplayEl.on('click', handleDeleteTask)
+
 
 
 // Todo: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
